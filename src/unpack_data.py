@@ -1,5 +1,6 @@
 import argparse
 from pathlib import Path
+import os
 
 import pandas as pd
 
@@ -26,13 +27,30 @@ def unpack_data(input_dir: str, output_file: str) -> None:
     4. Concatenate all DataFrames
     5. Save the combined DataFrame to output_file
     """
+    
     input_path = Path(input_dir)
     output_path = Path(output_file)
 
     # TODO: implement the unpacking logic
-    pass
+    
+    files = []
+    for (root, dirs, file) in os.walk(input_dir):
+        for f in file:
+            path = os.path.join(root, f)
+            files.append(path)
 
+    dfs = []
+    
+    for file in files: 
+        df = pd.read_csv(file)
+        dfs.append(df)
+    
+    combined_dfs = pd.concat(dfs, ignore_index=True)
+    
+    combined_dfs.info()
 
+    final_file = combined_dfs.to_csv(output_path)
+    
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Unpack and combine CSV files.")
     parser.add_argument("--input_dir", type=str, required=True)
